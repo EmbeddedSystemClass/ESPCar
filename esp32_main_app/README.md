@@ -1,5 +1,8 @@
-# Hello World Example
+# Main Directory for ESP32 application
 
-Starts a FreeRTOS task to print "Hello World"
+This is the main application that will be running on ESP32 microcontroller
 
-See the README.md file in the upper level 'examples' directory for more information about examples.
+The easiest way to build is to use PlatformIO, an addon for Microsoft's Visual Studio Code IDE.
+
+
+
