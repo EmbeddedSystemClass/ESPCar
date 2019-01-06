@@ -1,9 +1,17 @@
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
+# Ignore any visual studio files at any depth
+**/.vscode/
+
+# Ignore any build files at any depth
+**/build/
+
+# Ignore sdkconfig at any depth
+**/sdkconfig
+**/sdkconfig.old 
+
+# Ignore partitions.csv at any depth
+**/partitions.csv
+
+# Ignore generated files from Pycharm at any depth
+**/.idea
+**/__pycache__
+**/venv
