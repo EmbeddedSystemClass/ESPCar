@@ -84,7 +84,7 @@ the new connection, it will turn on and off an led, which is
 used for testing purposes.*/
 void tcp_server_task(void *pvParameters)
 {
-    char rx_buffer[128];
+    //char rx_buffer[128];
     char addr_str[128];
     int addr_family;
     int ip_protocol;
@@ -141,48 +141,20 @@ void tcp_server_task(void *pvParameters)
             break;
         }
         ESP_LOGI(TAG, "Socket accepted");
-        
+        vTaskDelay(1000 / portTICK_PERIOD_MS);  
+
+        xTaskCreate(&read_message_task, "read_message_task", 2048, (void*)sock, 5, NULL);
+        xTaskCreate(&send_message_task, "send_message_task", 2048, (void*)sock, 5, NULL);
+
         // Client accepted now we receive data
         while (1) 
-        {
-            int len = recv(sock, rx_buffer, sizeof(rx_buffer) - 1, 0);
-            // Error occured during receiving, break and close socket
-            if (len < 0) {
-                ESP_LOGE(TAG, "recv failed: errno %d", errno);
+        {   
+            if(eTaskGetState(&read_message_task) == 3) //This is not correct yet!
+            {
+                printf("Tasks were suspended!");
                 break;
             }
-            // Connection closed, break and close socket
-            else if (len == 0)
-            {
-                ESP_LOGI(TAG, "Connection closed");
-                break;
-            }
-            // Data received
-            else 
-            {
-                rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
-                ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
-                ESP_LOGI(TAG, "%s", rx_buffer);
-
-                // For demonstration purposes we switch on or off led 
-                if(atoi(rx_buffer) == 1)
-                {
-                    gpio_set_level(WHITE_BLINK, 1);
-                    write(sock, "Led turned on", strlen("Led turned on"));
-                }
-                else
-                {
-                    gpio_set_level(WHITE_BLINK, 0);
-                    write(sock, "Led turned off", strlen("Led turned 0ff"));
-                }
-            }
-        }
-
-        // Something went wrong, close socket and restart it 
-        if (sock != -1) {
-            ESP_LOGE(TAG, "Shutting down socket and restarting...");
-            shutdown(sock, 0);
-            close(sock);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);      
         }
     }
     vTaskDelete(NULL);
@@ -227,3 +199,65 @@ void print_sta_info(void *pvParam)
         printStationList();
 	}
 }
+
+/* Returns zero if there was a problem, otherwise one*/
+void read_message_task(void *pvParameters)
+{
+    int sock = (int) pvParameters;
+    char rx_buffer[128];
+    while(1)
+    {
+        int len = recv(sock, rx_buffer, sizeof(rx_buffer) - 1, 0);
+        // Error occured during receiving, close the sock, suspend the task
+        if (len < 0) 
+        {
+            ESP_LOGE(TAG, "recv failed: errno %d", errno);
+            close(sock);
+            vTaskSuspend(NULL); 
+             
+        }
+        // Connection closed, close the sock, suspend the task
+        else if (len == 0)
+        {
+            ESP_LOGI(TAG, "Connection closed");
+            close(sock);
+            vTaskSuspend(NULL);
+        }
+        // Data received
+        else 
+        {
+            rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
+            ESP_LOGI(TAG, "Received %d bytes", len);
+            ESP_LOGI(TAG, "%s", rx_buffer);
+
+            // For demonstration purposes we switch on or off led 
+            if(atoi(rx_buffer) == 1)
+            {
+                gpio_set_level(WHITE_BLINK, 1);
+                send(sock, "Led turned on", strlen("Led turned on"), 0);
+            }
+            else
+            {
+                gpio_set_level(WHITE_BLINK, 0);
+                send(sock, "Led turned off", strlen("Led turned 0ff"), 0);
+            }
+        }
+    }
+}
+
+void send_message_task(void *pvParameters)
+{
+    int sock = (int) pvParameters;
+    static const char * tx_buffer = "Hello Marko";
+
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+
+    while(1)
+    {
+        send(sock, tx_buffer, strlen(tx_buffer), 0);
+        vTaskDelayUntil( &xLastWakeTime, pdMS_TO_TICKS( 1000 ) ); 
+    }
+}
+
+// TODO:
+//     dostop do taskov bo bil queue 

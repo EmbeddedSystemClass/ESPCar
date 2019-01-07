@@ -41,7 +41,7 @@ esp_err_t event_handler(void *ctx, system_event_t *event);
 void start_dhcp_server();
 
 /* Creates an Access Point*/
-void initialise_wifi_in_ap(void);
+void initialise_wifi_in_ap();
 
 /* Print the list of connected stations */
 static void printStationList(); 
@@ -51,3 +51,7 @@ binds it and listens for new connections. After it accepts
 the new connection, it will turn on and off an led, which is 
 used for testing purposes.*/
 void tcp_server_task(void *pvParameters);
+
+void read_message_task(void *pvParameters);
+
+void send_message_task(void *pvParameters);
