@@ -10,8 +10,9 @@
 
 
 
+
 #define ECHO_TEST_TXD  (GPIO_NUM_17)
 #define ECHO_TEST_RXD  (GPIO_NUM_16)
 #define BUF_SIZE (2048)
 
-void ultrasonic_task();
+void gps_task();

@@ -56,8 +56,8 @@ void app_main()
 
     //xTaskCreate(&white_task, "white_task", 2048, NULL, 4, NULL);
     //xTaskCreate(&ultrasonic_task, "ultrasonic_task", 2048, NULL, 3, NULL);
-    //xTaskCreate(&gps_task, "gps_task", 2048, NULL, 3, NULL);
+    xTaskCreate(&gps_task, "gps_task", 2048, NULL, 3, NULL);
 
-	xTaskCreate(&tcp_server_task,"tcp_server",4096,NULL,5,NULL);
-    xTaskCreate(&print_sta_info,"print_sta_info",4096,NULL,5,NULL);
+	//xTaskCreate(&tcp_server_task,"tcp_server",4096,NULL,5,NULL);
+    //xTaskCreate(&print_sta_info,"print_sta_info",4096,NULL,5,NULL);
 }
