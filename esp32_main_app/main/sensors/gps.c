@@ -18,9 +18,11 @@ void gps_task(void *pvParameter)
 
     /*Allocate buffer*/
     uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
-    const uint8_t find[] = "$GPGLL";
-    char OUT_Char[50];
-    char *point;
+    const uint8_t Find[] = "$GPGLL";
+    char OUT_char[50];
+    char *Start_point;
+    int  Read_point;
+
 
     while (1) {
         // Read data from the UART
@@ -31,10 +33,16 @@ void gps_task(void *pvParameter)
         // If there is some data, display it.
         if(len !=0)
         {
-            point = strstr( (char * )data, (char *)find);
-            strncpy(OUT_Char,point,46);
-            printf("%s", OUT_Char);             // Display on monitor terminal 
-            printf("\n");                   // For clarity in monitor terminal
+            Start_point = strstr( (char * )data, (char *)Find);
+            strncpy(OUT_char,Start_point,46);
+            if (OUT_char[44] == A){
+                printf("%s", OUT_char);             // Display on monitor terminal 
+                printf("\n");
+            }else{
+                printf("NO GPS");                   // If no signal display no GPS
+                printf("\n"); 
+            }
+        
             memset(data,0, BUF_SIZE);       // Needed to clear all data buffer, othwerwise you will see also garbage on output
         }
     }
