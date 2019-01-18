@@ -35,7 +35,7 @@ void gps_task(void *pvParameter)
         {
             Start_point = strstr( (char * )data, (char *)Find);
             strncpy(OUT_char,Start_point,46);
-            if (OUT_char[44] == A){
+            if (OUT_char[44] == 'A'){
                 printf("%s", OUT_char);             // Display on monitor terminal 
                 printf("\n");
             }else{
