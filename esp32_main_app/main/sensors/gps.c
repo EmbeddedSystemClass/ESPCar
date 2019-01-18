@@ -19,7 +19,7 @@ void gps_task(void *pvParameter)
     /*Allocate buffer*/
     uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
     const uint8_t Find[] = "$GPGLL";
-    char OUT_char[50];
+    char OUT_char[] =  "$GPGLL,4630.60009,N,01542.04651,E,165911.00,A,A\n";
     char *Start_point;
     int  Read_point;
 
@@ -33,13 +33,33 @@ void gps_task(void *pvParameter)
         // If there is some data, display it.
         if(len !=0)
         {
-            Start_point = strstr( (char * )data, (char *)Find);
-            strncpy(OUT_char,Start_point,46);
-            if (OUT_char[44] == 'A'){
-                printf("%s", OUT_char);             // Display on monitor terminal 
+            //Start_point = strstr( (char * )data, (char *)Find);     // poisce vrstico z $GPLL
+            //strncpy(OUT_char,Start_point,46);                       // izpise samo 46 charjev
+           
+            if (OUT_char[44] == 'A'){                               // preveri ce je gps signal
+                printf("%s", OUT_char);                             // ce je signal izpisi dobljeno 
                 printf("\n");
+                printf("%c",OUT_char[7]);
+                printf("%c°",OUT_char[8]);
+                printf("%c",OUT_char[9]);
+                printf("%c,",OUT_char[10]);
+                printf("%c",OUT_char[12]);
+                printf("%c'",OUT_char[13]);
+                printf(":%c;",OUT_char[18]);                        // NORTH
+                printf("\n");
+                printf("%c",OUT_char[20]);
+                printf("%c",OUT_char[21]);
+                printf("%c°",OUT_char[22]);
+                printf("%c",OUT_char[23]);
+                printf("%c,",OUT_char[24]);
+                printf("%c",OUT_char[26]);
+                printf("%c",OUT_char[27]);
+                printf(":%c;",OUT_char[32]);                        //EAST
+                printf("\n");
+
             }else{
-                printf("NO GPS");                   // If no signal display no GPS
+                printf("%s", OUT_char);                             // zacasno da vidimo kak dela ko ni signala 
+                //printf("NO GPS");                                 // If no signal display no GPS
                 printf("\n"); 
             }
         
