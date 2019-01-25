@@ -19,9 +19,13 @@ void gps_task(void *pvParameter)
     /*Allocate buffer*/
     uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
     const uint8_t Find[] = "$GPGLL";
-    char OUT_char[] =  "$GPGLL,4630.60009,N,01542.04651,E,165911.00,A,A\n";
+    char OUT_char[100];
     char *Start_point;
-    int  Read_point;
+    char Str_Cue[100];
+    char vejica = ',';
+    char stopinja = '"';
+    char dvopicje = ':';
+
 
 
     while (1) {
@@ -33,33 +37,42 @@ void gps_task(void *pvParameter)
         // If there is some data, display it.
         if(len !=0)
         {
-            //Start_point = strstr( (char * )data, (char *)Find);     // poisce vrstico z $GPLL
-            //strncpy(OUT_char,Start_point,46);                       // izpise samo 46 charjev
+            Start_point = strstr( (char * )data, (char *)Find);     // poisce vrstico z $GPLL
+            strncpy(OUT_char,Start_point,46);                       // izpise samo 46 charjev
            
             if (OUT_char[44] == 'A'){                               // preveri ce je gps signal
-                printf("%s", OUT_char);                             // ce je signal izpisi dobljeno 
-                printf("\n");
-                printf("%c",OUT_char[7]);
-                printf("%c°",OUT_char[8]);
-                printf("%c",OUT_char[9]);
-                printf("%c,",OUT_char[10]);
-                printf("%c",OUT_char[12]);
-                printf("%c'",OUT_char[13]);
-                printf(":%c;",OUT_char[18]);                        // NORTH
-                printf("\n");
-                printf("%c",OUT_char[20]);
-                printf("%c",OUT_char[21]);
-                printf("%c°",OUT_char[22]);
-                printf("%c",OUT_char[23]);
-                printf("%c,",OUT_char[24]);
-                printf("%c",OUT_char[26]);
-                printf("%c",OUT_char[27]);
-                printf(":%c;",OUT_char[32]);                        //EAST
+                
+                Str_Cue [0] = OUT_char [7];
+                Str_Cue [1] = OUT_char [8];
+                Str_Cue [2] = stopinja;
+                Str_Cue [3] = OUT_char [9];
+                Str_Cue [4] = OUT_char [10];
+                Str_Cue [5] = vejica;
+                Str_Cue [6] = OUT_char [12];
+                Str_Cue [7] = OUT_char [13];
+                Str_Cue [8] = dvopicje;
+                Str_Cue [9] = OUT_char [18];
+                Str_Cue [10] = dvopicje;
+                Str_Cue [11] = OUT_char [20];
+                Str_Cue [12] = OUT_char [21];
+                Str_Cue [13] = OUT_char [22];
+                Str_Cue [14] = stopinja;
+                Str_Cue [15] = OUT_char [23];
+                Str_Cue [16] = OUT_char [24];
+                Str_Cue [17] = vejica;
+                Str_Cue [18] = OUT_char [26];
+                Str_Cue [19] = OUT_char [27];
+                Str_Cue [20] = dvopicje;
+                Str_Cue [21] = OUT_char [32];
+                Str_Cue [22] = '\0';
+
+
+                printf("%s",Str_Cue);
                 printf("\n");
 
-            }else{
-                printf("%s", OUT_char);                             // zacasno da vidimo kak dela ko ni signala 
-                //printf("NO GPS");                                 // If no signal display no GPS
+
+            }else{ 
+                printf("NO GPS");                                 // If no signal display no GPS
                 printf("\n"); 
             }
         
