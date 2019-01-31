@@ -17,6 +17,11 @@ void ultrasonic_task(void *pvParameter)
     float distance = 0;
     float divider = 58;
     
+    /*Variables for queue*/
+    BaseType_t xStatus;
+    int * buffer;
+    int stopFlag = 0; 
+
     while(1)
     {
         /*Send short pulse*/
@@ -34,7 +39,25 @@ void ultrasonic_task(void *pvParameter)
 
         /*Calculate the distance to 1 mm accuracy*/
         distance = (float) (endOfPulse - startOfPulse) / divider;
-        printf("%0.1f cm.\n", distance);
-        vTaskDelay(100 / portTICK_PERIOD_MS);           // Change time here to change sample time
+        //printf("%0.1f cm.\n", distance);
+
+        if (distance < THRESHOLD) 
+        {
+            stopFlag = 1; 
+            printf("stopFlag = 1\n");
+        }
+        else 
+        {   stopFlag = 0;
+        }
+        buffer = &stopFlag;
+        /*Send to queue*/
+        xStatus = xQueueSend( ultrasonic_queue, ( void * ) &buffer, 0 );
+
+        if( xStatus != pdPASS )
+        {
+            printf( "Could not send to the motor_queue.\r\n" );
+        }
+
+        vTaskDelay(10 / portTICK_PERIOD_MS);           // Change time here to change sample time
     }   
 }

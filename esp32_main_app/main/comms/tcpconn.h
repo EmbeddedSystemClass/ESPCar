@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/fcntl.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
+#include "freertos/queue.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "esp_event_loop.h"
@@ -16,10 +18,18 @@
 #include "lwip/dns.h"
 #include "driver/gpio.h"
 
-#define WHITE_BLINK (GPIO_NUM_18)
+
+#define WHITE_BLINK (GPIO_NUM_16)
 #define AP_SSID "ESP_32"
 #define AP_PASSPHARSE "12345678"            
 
+
+//Static variables for following states of tasks read_message_task and send_message_task
+static int read_message_running = 0;
+static int send_message_running = 0;
+
+
+extern QueueHandle_t motor_queue;
 
 // Used for wifi event handling
 static EventGroupHandle_t wifi_event_group;
@@ -36,7 +46,6 @@ it sets appropriate bit in wifi_event_group, thus enabling execution
 of code that was dependend on event. */
 esp_err_t event_handler(void *ctx, system_event_t *event);
 
-
 /* Function assings static IP to ESP32 and starts up DHCP server*/
 void start_dhcp_server();
 
@@ -44,8 +53,12 @@ void start_dhcp_server();
 void initialise_wifi_in_ap();
 
 /* Print the list of connected stations */
-static void printStationList(); 
+static void printStationList();
 
+
+void print_sta_info(void *pvParameters); 
+
+ 
 /* Function starts up a TCP connection: it creates a socket, 
 binds it and listens for new connections. After it accepts 
 the new connection, it will turn on and off an led, which is 

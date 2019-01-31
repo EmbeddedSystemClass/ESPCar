@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
 
@@ -18,30 +19,33 @@
 #include "comms/tcpconn.c"
 #include "actuators/motorcontrol.c"
 
-#define WHITE_BLINK (GPIO_NUM_18)
+#define GREEN_BLINK (GPIO_NUM_2)
 
-void white_task(void *pvParameter)
+void green_task(void *pvParameter)
 {
     /*White Led setup*/
-    gpio_pad_select_gpio(WHITE_BLINK);
-    gpio_set_direction(WHITE_BLINK, GPIO_MODE_OUTPUT);
-
+    gpio_pad_select_gpio(GREEN_BLINK);
+    gpio_set_direction(GREEN_BLINK, GPIO_MODE_OUTPUT);
+    const TickType_t xDelay1000ms = pdMS_TO_TICKS( 1000 );
     while(1) {
          /* Blink off (output low) */
-        gpio_set_level(WHITE_BLINK, 1);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        gpio_set_level(GREEN_BLINK, 1);
+        vTaskDelay(xDelay1000ms);
         /* Blink on (output high) */
-        gpio_set_level(WHITE_BLINK, 0);
-        vTaskDelay(100 / portTICK_PERIOD_MS);   
+        gpio_set_level(GREEN_BLINK, 0);
+        vTaskDelay(xDelay1000ms);   
     }
 }
 
+QueueHandle_t motor_queue;
+QueueHandle_t ultrasonic_queue;
+
 void app_main()
 {
-		// Initialize non-volatile flash space
+	// Initialize non-volatile flash space
 	nvs_flash_init();
 
-    // Start up the event handler 
+    //Start up the event handler 
     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
     wifi_event_group = xEventGroupCreate();
 
@@ -51,13 +55,17 @@ void app_main()
     // Set ESP32 as AP
     initialise_wifi_in_ap();
 
-	gpio_pad_select_gpio(WHITE_BLINK);
-    gpio_set_direction(WHITE_BLINK, GPIO_MODE_OUTPUT);
+    motor_queue = xQueueCreate( 20, sizeof( char* ) );
+    if( motor_queue == 0 ) printf("Failed to create motor_queue.\n");
 
-    //xTaskCreate(&white_task, "white_task", 2048, NULL, 4, NULL);
-    //xTaskCreate(&ultrasonic_task, "ultrasonic_task", 2048, NULL, 3, NULL);
+    ultrasonic_queue = xQueueCreate( 1, sizeof( int* ) );
+     if( ultrasonic_queue == 0 ) printf("Failed to create ultrasonic_queue.\n");
+
+    xTaskCreate(&green_task, "green_task", 1024, NULL, 5, NULL);
+    xTaskCreate(&ultrasonic_task, "ultrasonic_task", 2048, NULL, 3, NULL);
     //xTaskCreate(&gps_task, "gps_task", 2048, NULL, 3, NULL);
 
 	xTaskCreate(&tcp_server_task,"tcp_server",4096,NULL,5,NULL);
-    xTaskCreate(&print_sta_info,"print_sta_info",4096,NULL,5,NULL);
+    //xTaskCreate(&print_sta_info,"print_sta_info",4096,NULL,5,NULL);
+    xTaskCreate(&motor_control_task, "motor_control_task", 4096, NULL, 5, NULL);
 }
