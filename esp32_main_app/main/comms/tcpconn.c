@@ -284,8 +284,15 @@ void send_message_task(void *pvParameters)
 
     while(1)
     {
+        // send motor data
         xStatus = xQueueReceive( motor_queue, tx_buffer, portMAX_DELAY );
         printf("Received command: %s\n", tx_buffer);
+        memset(tx_buffer,0, 128);
+        //send(sock, tx_buffer, strlen(tx_buffer), 0);
+
+        // send GPS data
+        xStatus = xQueueReceive( gps_queue, tx_buffer, portMAX_DELAY );
+        printf("Received gps: %s\n", tx_buffer);
         memset(tx_buffer,0, 128);
         //send(sock, tx_buffer, strlen(tx_buffer), 0);
     }

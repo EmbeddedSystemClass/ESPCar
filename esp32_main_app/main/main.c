@@ -39,6 +39,7 @@ void green_task(void *pvParameter)
 
 QueueHandle_t motor_queue;
 QueueHandle_t ultrasonic_queue;
+QueueHandle_t gps_queue;
 
 void app_main()
 {
@@ -61,9 +62,12 @@ void app_main()
     ultrasonic_queue = xQueueCreate( 1, sizeof( int* ) );
      if( ultrasonic_queue == 0 ) printf("Failed to create ultrasonic_queue.\n");
 
+    gps_queue = xQueueCreate( 20, sizeof( char* ) );
+     if( gps_queue == 0 ) printf("Failed to create gps_queue.\n");
+
     xTaskCreate(&green_task, "green_task", 1024, NULL, 5, NULL);
     xTaskCreate(&ultrasonic_task, "ultrasonic_task", 2048, NULL, 3, NULL);
-    //xTaskCreate(&gps_task, "gps_task", 2048, NULL, 3, NULL);
+    xTaskCreate(&gps_task, "gps_task", 2048, NULL, 3, NULL);
 
 	xTaskCreate(&tcp_server_task,"tcp_server",4096,NULL,5,NULL);
     //xTaskCreate(&print_sta_info,"print_sta_info",4096,NULL,5,NULL);

@@ -14,4 +14,6 @@
 #define ECHO_TEST_RXD  (GPIO_NUM_16)
 #define BUF_SIZE (2048)
 
+extern QueueHandle_t gps_queue;
+
 void gps_task(void *pvParameter);
