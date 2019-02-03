@@ -36,12 +36,12 @@ void motor_control_task(void *pvParameter)
             if(*stopFlag == 0)
             {              
                 /* Car can move, no object inside threshold*/
-                if(strcmp(tx_buffer, "1") == 0)         drive_forward(SPEED);
-                else if(strcmp(tx_buffer, "2") == 0)    drive_backward(SPEED);
-                else if(strcmp(tx_buffer, "3") == 0)    turn_left(TURN);
-                else if(strcmp(tx_buffer, "4") == 0)    turn_right(TURN);
-                else if(strcmp(tx_buffer, "5") == 0)    turn_right(TURN); //drive_forward_right(SPEED);
-                else if(strcmp(tx_buffer, "6") == 0)    turn_left(TURN); // drive_forward_left(SPEED);
+                if(strcmp(tx_buffer, "UP") == 0)            drive_forward(SPEED);
+                else if(strcmp(tx_buffer, "DOWN") == 0)     drive_backward(SPEED);
+                else if(strcmp(tx_buffer, "LEFT") == 0)     turn_left(TURN);
+                else if(strcmp(tx_buffer, "RIGHT") == 0)    turn_right(TURN);
+                else if(strcmp(tx_buffer, "UPRIGHT") == 0)  turn_right(TURN); //drive_forward_right(SPEED);
+                else if(strcmp(tx_buffer, "UPLEFT") == 0)   turn_left(TURN); // drive_forward_left(SPEED);
                 else stop();
                 memset(tx_buffer,0, 128);
             }
@@ -49,7 +49,7 @@ void motor_control_task(void *pvParameter)
             {
                 printf("WE got here");
                 /* Object inside threshold, car can only move backward*/
-                if(strcmp(tx_buffer, "2") == 0)    
+                if(strcmp(tx_buffer, "DOWN") == 0)    
                     drive_backward(SPEED);
                 else
                     stop();

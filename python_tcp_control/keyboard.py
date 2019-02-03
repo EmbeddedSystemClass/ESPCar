@@ -83,18 +83,18 @@ def create_message(key_states):
     """depending on states of key create a message"""
     if key_states.up:
         if key_states.right and not key_states.left:
-            return "5"
+            return "UPRIGHT"
         elif key_states.left and not key_states.right:
-            return "6"
+            return "UPLEFT"
         elif key_states.left and key_states.right:
-            return "1"
+            return "UP"
         else:
-            return "1"
+            return "UP"
     elif key_states.down:
-        return "2"
+        return "DOWN"
     elif key_states.left:
-        return "3"
+        return "LEFT"
     elif key_states.right:
-        return "4"
+        return "RIGHT"
     else:
-        return "0"
+        return "NONE"

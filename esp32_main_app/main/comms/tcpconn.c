@@ -4,7 +4,7 @@
 /* Function is looking for specific wifi related events, such as 
 connection of station, start of Ap point etc. If event happens 
 it sets appropriate bit in wifi_event_group, thus enabling execution 
-of code that was dependend on event. */
+of code that dependend on event. */
 esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     switch(event->event_id)
@@ -149,7 +149,7 @@ void tcp_server_task(void *pvParameters)
         vTaskDelay(1000 / portTICK_PERIOD_MS);  
 
         xTaskCreate(&read_message_task, "read_message_task", 2048, (void*)sock, 5, NULL);
-        //xTaskCreate(&send_message_task, "send_message_task", 2048, (void*)sock, 5, NULL);
+        xTaskCreate(&send_message_task, "send_message_task", 2048, (void*)sock, 1, NULL);
 
         // Client accepted now we receive data
         while (1) 
@@ -259,17 +259,6 @@ void read_message_task(void *pvParameters)
                 one item! */
                 printf( "Could not send to the motor_queue.\r\n" );
             }
-            // For demonstration purposes we switch on or off led 
-            // if(atoi(rx_buffer) == 1)
-            // {
-            //     gpio_set_level(WHITE_BLINK, 1);
-            //     send(sock, "Led turned on", strlen("Led turned on"), 0);
-            // }
-            // else
-            // {
-            //     gpio_set_level(WHITE_BLINK, 0);
-            //     send(sock, "Led turned off", strlen("Led turned 0ff"), 0);
-            // }
         }
     }
 }
@@ -277,17 +266,21 @@ void read_message_task(void *pvParameters)
 void send_message_task(void *pvParameters)
 {
     int sock = (int) pvParameters;
-    char tx_buffer[128];
+    char *tx_buffer;
     BaseType_t xStatus;
     send_message_running = 1;
-    memset(tx_buffer,0, 128);
+    //memset(tx_buffer,0, 128);
 
     while(1)
     {
-        xStatus = xQueueReceive( motor_queue, tx_buffer, portMAX_DELAY );
-        printf("Received command: %s\n", tx_buffer);
+        // Send GPS data
+        xStatus = xQueueReceive( gps_queue, &(tx_buffer), portMAX_DELAY );
+        int err = send(sock, tx_buffer, 22, 0);
+        if (err < 0) {
+            ESP_LOGE(TAG, "Error occured during sending: errno %d", errno);
+        }
         memset(tx_buffer,0, 128);
-        //send(sock, tx_buffer, strlen(tx_buffer), 0);
+        vTaskDelay(1000 / portTICK_PERIOD_MS); 
     }
 }
 

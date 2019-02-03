@@ -1,6 +1,5 @@
 import socket
 import sys
-from keyboard import KeyStates
 
 
 def socket_int(ip, port):
@@ -22,16 +21,24 @@ def socket_int(ip, port):
 
 
 def send(sock, msg):
-
+    """Send message to ESP"""
     # default encoding to utf-8
     msg = msg.encode()
     sock.sendall(msg)
 
-    #data = sock.recv(1024)
-
-    #if data:
-    #    print('Reply: ' + data.decode())
-
-
     #sock.close()
+
+
+def receive(sock):
+    """Receive message, in case of blocking error fail silently"""
+    try:
+        data = sock.recv(22)
+    except BlockingIOError:
+        # In case of
+        pass
+    else:
+        if data:
+            data = str(data.decode('unicode_escape'))
+            print(data)
+
 

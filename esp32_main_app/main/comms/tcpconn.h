@@ -30,6 +30,7 @@ static int send_message_running = 0;
 
 
 extern QueueHandle_t motor_queue;
+extern QueueHandle_t gps_queue;
 
 // Used for wifi event handling
 static EventGroupHandle_t wifi_event_group;

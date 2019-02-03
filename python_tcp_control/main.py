@@ -18,6 +18,7 @@ key_states = KeyStates()
 
 # Connect to server and expose sock object for further use
 sock = socket_int(ip, port)
+sock.setblocking(0)
 print("Connected to " + ip + "\n")
 
 while True:
@@ -35,3 +36,5 @@ while True:
             sleep(0.01)
             send(sock, msg)
 
+    # Receive data
+    receive(sock)
