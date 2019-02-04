@@ -15,7 +15,7 @@
 
 #include "sensors/gps.c" 
 #include "sensors/ultrasonic.c" 
-#include "sensors/accelmagneto.c" 
+//#include "sensors/accelmagneto.h" 
 #include "comms/tcpconn.c"
 #include "actuators/motorcontrol.c"
 
@@ -44,13 +44,13 @@ QueueHandle_t gps_queue;
 void app_main()
 {
 	// Initialize non-volatile flash space
-	nvs_flash_init();
+	 nvs_flash_init();
 
     //Start up the event handler 
     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
     wifi_event_group = xEventGroupCreate();
 
-    // Setup IP of ESP32 and start DHCP 
+    //Setup IP of ESP32 and start DHCP 
     start_dhcp_server();
 
     // Set ESP32 as AP
@@ -72,4 +72,7 @@ void app_main()
 	xTaskCreate(&tcp_server_task,"tcp_server",4096,NULL,5,NULL);
     //xTaskCreate(&print_sta_info,"print_sta_info",4096,NULL,5,NULL);
     xTaskCreate(&motor_control_task, "motor_control_task", 4096, NULL, 5, NULL);
+
+    // // Initialize accelmagneto sensor
+    // IMU_Init();
 }

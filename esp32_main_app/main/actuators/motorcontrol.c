@@ -60,7 +60,7 @@ void motor_control_task(void *pvParameter)
         {
             if(*stopFlag == 1) 
             {
-                if(strcmp(tx_buffer, "2") == 0)    
+                if(strcmp(tx_buffer, "DOWN") == 0)    
                     drive_backward(SPEED);
                 else
                     stop();

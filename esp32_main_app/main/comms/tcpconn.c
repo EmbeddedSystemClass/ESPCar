@@ -107,7 +107,7 @@ void tcp_server_task(void *pvParameters)
     inet_ntoa_r(destAddr.sin_addr, addr_str, sizeof(addr_str) - 1);
 
     // Waits for AP to start
-	xEventGroupWaitBits(wifi_event_group,AP_STARTED_BIT,false,true,portMAX_DELAY);
+	xEventGroupWaitBits(wifi_event_group, AP_STARTED_BIT, false, true, portMAX_DELAY);
 
     // With this while loop we make it possible to connect again 
     // in case we close the socket after transmission. 
@@ -270,16 +270,18 @@ void send_message_task(void *pvParameters)
     BaseType_t xStatus;
     send_message_running = 1;
     //memset(tx_buffer,0, 128);
-
+    int err;
     while(1)
     {
         // Send GPS data
         xStatus = xQueueReceive( gps_queue, &(tx_buffer), portMAX_DELAY );
-        int err = send(sock, tx_buffer, 22, 0);
+        err = send(sock, tx_buffer, 22, 0);
         if (err < 0) {
             ESP_LOGE(TAG, "Error occured during sending: errno %d", errno);
         }
         memset(tx_buffer,0, 128);
+        //vTaskDelay(1000 / portTICK_PERIOD_MS); 
+
         vTaskDelay(1000 / portTICK_PERIOD_MS); 
     }
 }

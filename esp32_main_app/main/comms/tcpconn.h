@@ -34,9 +34,12 @@ extern QueueHandle_t gps_queue;
 
 // Used for wifi event handling
 static EventGroupHandle_t wifi_event_group;
-const int CLIENT_CONNECTED_BIT = BIT0;
-const int CLIENT_DISCONNECTED_BIT = BIT1;
-const int AP_STARTED_BIT = BIT2;
+// const int CLIENT_CONNECTED_BIT = BIT0;
+// const int CLIENT_DISCONNECTED_BIT = BIT1;
+// const int AP_STARTED_BIT = BIT2;
+#define CLIENT_CONNECTED_BIT BIT0
+#define CLIENT_DISCONNECTED_BIT  BIT1
+#define AP_STARTED_BIT BIT2
 
 // Used for log ouput
 static const char *TAG="ap_mode_tcp_server";
